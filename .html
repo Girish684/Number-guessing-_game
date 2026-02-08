@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Idea Layering App</title>
+
+  <!-- STYLE (CSS) -->
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      font-family: Arial;
+    }
+
+    #sidebar {
+      width: 250px;
+      background: #111;
+      color: white;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    #canvas {
+      flex: 1;
+      position: relative;
+      background: #f2f2f2;
+      overflow: auto;
+    }
+
+    .idea {
+      position: absolute;
+      background: white;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: move;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    button, input, select {
+      width: 100%;
+      margin-top: 6px;
+      padding: 6px;
+      border-radius: 4px;
+      border: none;
+    }
+
+    button {
+      background: #1f6fff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1558cc;
+    }
+
+    .layer {
+      margin-top: 6px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <h3>Idea Layers</h3>
+
+    <input id="newLayer" placeholder="New layer name">
+    <button onclick="addLayer()">Add Layer</button>
+
+    <div id="layers"></div>
+
+    <hr>
+
+    <input id="newIdea" placeholder="New idea">
+    <select id="layerSelect"></select>
+    <button onclick="addIdea()">Add Idea</button>
+  </div>
+
+  <!-- CANVAS -->
+  <div id="canvas"></div>
+
+  <!-- LOGIC (JAVASCRIPT) -->
+  <script>
+    const canvas = document.getElementById("canvas");
+    const layersDiv = document.getElementById("layers");
+    const layerSelect = document.getElementById("layerSelect");
+
+    let layers = { Core: true };
+    let ideas = [];
+
+    function renderLayers() {
+      layersDiv.innerHTML = "";
+      layerSelect.innerHTML = "";
+
+      for (let name in layers) {
+        layersDiv.innerHTML += `
+          <div class="layer">
+            <label>
+              <input type="checkbox" checked onchange="toggleLayer('${name}')">
+              ${name}
+            </label>
+          </div>
+        `;
+
+        let opt = document.createElement("option");
+        opt.value = name;
+        opt.text = name;
+        layerSelect.appendChild(opt);
+      }
+    }
+
+    function renderIdeas() {
+      canvas.innerHTML = "";
+
+      ideas.forEach(idea => {
+        if (!layers[idea.layer]) return;
+
+        let div = document.createElement("div");
+        div.className = "idea";
+        div.innerText = idea.text;
+        div.style.left = idea.x + "px";
+        div.style.top = idea.y + "px";
+
+        drag(div, idea);
+        canvas.appendChild(div);
+      });
+    }
+
+    function addLayer() {
+      let name = document.getElementById("newLayer").value.trim();
+      if (!name) return;
+
+      layers[name] = true;
+      document.getElementById("newLayer").value = "";
+      renderLayers();
+      renderIdeas();
+    }
+
+    function toggleLayer(name) {
+      layers[name] = !layers[name];
+      renderIdeas();
+    }
+
+    function addIdea() {
+      let text = document.getElementById("newIdea").value.trim();
+      let layer = layerSelect.value;
+      if (!text) return;
+
+      ideas.push({
+        text,
+        layer,
+        x: 100 + Math.random() * 200,
+        y: 100 + Math.random() * 200
+      });
+
+      document.getElementById("newIdea").value = "";
+      renderIdeas();
+    }
+
+    function drag(el, idea) {
+      el.onmousedown = e => {
+        let dx = e.clientX - el.offsetLeft;
+        let dy = e.clientY - el.offsetTop;
+
+        document.onmousemove = e => {
+          idea.x = e.clientX - dx;
+          idea.y = e.clientY - dy;
+          el.style.left = idea.x + "px";
+          el.style.top = idea.y + "px";
+        };
+
+        document.onmouseup = () => {
+          document.onmousemove = null;
+        };
+      };
+    }
+
+    renderLayers();
+    renderIdeas();
+  </script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Idea Layering App</title>
+
+  <!-- STYLE (CSS) -->
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      font-family: Arial;
+    }
+
+    #sidebar {
+      width: 250px;
+      background: #111;
+      color: white;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    #canvas {
+      flex: 1;
+      position: relative;
+      background: #f2f2f2;
+      overflow: auto;
+    }
+
+    .idea {
+      position: absolute;
+      background: white;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: move;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    button, input, select {
+      width: 100%;
+      margin-top: 6px;
+      padding: 6px;
+      border-radius: 4px;
+      border: none;
+    }
+
+    button {
+      background: #1f6fff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1558cc;
+    }
+
+    .layer {
+      margin-top: 6px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <h3>Idea Layers</h3>
+
+    <input id="newLayer" placeholder="New layer name">
+    <button onclick="addLayer()">Add Layer</button>
+
+    <div id="layers"></div>
+
+    <hr>
+
+    <input id="newIdea" placeholder="New idea">
+    <select id="layerSelect"></select>
+    <button onclick="addIdea()">Add Idea</button>
+  </div>
+
+  <!-- CANVAS -->
+  <div id="canvas"></div>
+
+  <!-- LOGIC (JAVASCRIPT) -->
+  <script>
+    const canvas = document.getElementById("canvas");
+    const layersDiv = document.getElementById("layers");
+    const layerSelect = document.getElementById("layerSelect");
+
+    let layers = { Core: true };
+    let ideas = [];
+
+    function renderLayers() {
+      layersDiv.innerHTML = "";
+      layerSelect.innerHTML = "";
+
+      for (let name in layers) {
+        layersDiv.innerHTML += `
+          <div class="layer">
+            <label>
+              <input type="checkbox" checked onchange="toggleLayer('${name}')">
+              ${name}
+            </label>
+          </div>
+        `;
+
+        let opt = document.createElement("option");
+        opt.value = name;
+        opt.text = name;
+        layerSelect.appendChild(opt);
+      }
+    }
+
+    function renderIdeas() {
+      canvas.innerHTML = "";
+
+      ideas.forEach(idea => {
+        if (!layers[idea.layer]) return;
+
+        let div = document.createElement("div");
+        div.className = "idea";
+        div.innerText = idea.text;
+        div.style.left = idea.x + "px";
+        div.style.top = idea.y + "px";
+
+        drag(div, idea);
+        canvas.appendChild(div);
+      });
+    }
+
+    function addLayer() {
+      let name = document.getElementById("newLayer").value.trim();
+      if (!name) return;
+
+      layers[name] = true;
+      document.getElementById("newLayer").value = "";
+      renderLayers();
+      renderIdeas();
+    }
+
+    function toggleLayer(name) {
+      layers[name] = !layers[name];
+      renderIdeas();
+    }
+
+    function addIdea() {
+      let text = document.getElementById("newIdea").value.trim();
+      let layer = layerSelect.value;
+      if (!text) return;
+
+      ideas.push({
+        text,
+        layer,
+        x: 100 + Math.random() * 200,
+        y: 100 + Math.random() * 200
+      });
+
+      document.getElementById("newIdea").value = "";
+      renderIdeas();
+    }
+
+    function drag(el, idea) {
+      el.onmousedown = e => {
+        let dx = e.clientX - el.offsetLeft;
+        let dy = e.clientY - el.offsetTop;
+
+        document.onmousemove = e => {
+          idea.x = e.clientX - dx;
+          idea.y = e.clientY - dy;
+          el.style.left = idea.x + "px";
+          el.style.top = idea.y + "px";
+        };
+
+        document.onmouseup = () => {
+          document.onmousemove = null;
+        };
+      };
+    }
+
+    renderLayers();
+    renderIdeas();
+  </script>
+
+</body>
+</html>
